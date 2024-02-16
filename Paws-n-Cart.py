@@ -1,23 +1,8 @@
-# Paws n Cart
+# Paws_n_Cart.py
 
-# Improvements to be made
-    # 
-
-# Create an empty list to store the contents of the cart
-cart_contents = []
-
-# Define column names for tabulating the cart contents
-col_names = ["Item", "Price", "Quantity"]
-
-# Import the 'tabulate' library for creating formatted tables
 from tabulate import tabulate
 
-# Print a welcome message
-print("\nWelcome to Paws n Cart")
-
-# Start an infinite loop that shows the menu options
-while True:
-    # Display the main menu options
+def display_menu():
     print("\n")
     print("-" * 80)
     print("Paws n Cart Shopping Cart: ")
@@ -29,83 +14,61 @@ while True:
     print("4. Checkout")
     print("5. Exit")
 
-    # Ask the user to choose an option
-    choice = input("\nPlease enter the number of the option that you would like to choose: ")
+def add_item(cart_contents):
+    item = input("\nWhat item would you like to add to your cart: ")
+    price = float(input("\nHow much does the item cost: £"))
+    quantity = int(input("\nEnter the quantity: "))
+    cart_contents.append((item, price, quantity))
+    print("\n{} has been added to your cart.".format(item, quantity))
 
-    try:
-        # If the user chooses to add an item to the cart
+def remove_item(cart_contents):
+    remove = input("\nWhich item would you like to remove: ")
+    found = False
+    for item_info in cart_contents:
+        if item_info[0] == remove:
+            cart_contents.remove(item_info)
+            found = True
+            print("\n{} has been removed from your cart.".format(remove))
+            break
+    if not found:
+        print("\nThat item is not in your cart.")
+
+
+def view_cart(cart_contents, col_names):
+    print("\nThis is your cart:")
+    print(tabulate(cart_contents, headers=col_names, tablefmt="heavy_grid"))
+
+def checkout(cart_contents):
+    if not cart_contents:
+        print("\nYour cart is empty. Please add items before checking out.")
+        return False
+    else:
+        total_cost = sum(price * quantity for _, price, quantity in cart_contents)
+        print("Total cost of your cart: £{:.2f}".format(total_cost))
+        print("Thank you for shopping with Paws n Cart")
+        return True
+
+def start():
+    cart_contents = []
+    col_names = ["Item", "Price", "Quantity"]
+    print("\nWelcome to Paws n Cart")
+    while True:
+        display_menu()
+        choice = input("\nPlease enter the number of the option that you would like to choose: ")
         if choice == "1":
-            item = input("\nWhat item would you like to add to your cart: ")
-            try:
-                price = float(input("\nHow much does the item cost: £"))
-                try:
-                    quantity = int(input("\nEnter the quantity: "))
-                except ValueError:
-                    print("\nError: Please enter a numeric value for the quantity")
-                    continue
-
-                # Add the item and its price to the cart
-                cart_contents.append((item, price, quantity))
-
-                # Confirm that the item has been added to the cart
-                print("\n{} has been added to your cart.".format(item, quantity))
-
-            except ValueError:
-                print("\nError: Please enter a numeric value for the price")
-                continue
-
-        # If the user chooses to remove an item from the cart
+            add_item(cart_contents)
         elif choice == "2":
-            remove = input("\nWhich item would you like to remove: ")
-
-            # Iterate through the cart_contents list to find and remove the chosen item
-            found = False
-            for item, price, quantity in cart_contents:
-                if item == remove:
-                    cart_contents.remove((item, price, quantity))
-                    found = True
-
-                    # Confirm that the item has been removed from the cart
-                    print("\n{} has been removed from your cart.".format(remove))
-                    break
-
-            # If the chosen item is not found in the cart, display an error message
-            if not found:
-                print("\nThat item is not in your cart.")
-
-        # If the user chooses to view the contents of their cart
+            remove_item(cart_contents)
         elif choice == "3":
-            print("\nThis is your cart:")
-            print(tabulate(cart_contents, headers=col_names, tablefmt="heavy_grid"))
-
-        # If the user chooses to checkout
+            view_cart(cart_contents, col_names)
         elif choice == "4":
-            if not cart_contents:
-                print("\nYour cart is empty. Please add items before checking out.")
-            else:
-                # Calculate the total cost of items in the cart
-                total_cost = sum(price * quantity for item, price, quantity in cart_contents)
-
-                # Display the total cost and a thank you message
-                print("Total cost of your cart: £{:.2f}".format(total_cost))
-                print("Thank you for shopping with Paws n Cart")
-
-                # Exit the loop
+            if checkout(cart_contents):
                 break
-
-        # If the user chooses to exit the program
         elif choice == "5":
             print("\nThank you for shopping with Paws n Cart. Exiting...\n")
             break
-
-        # Print an error message if the user chooses an invalid option
         else:
             print("\nInvalid option choice")
 
-    # Handle potential ValueErrors
-    except ValueError as ve:
-        print(f"\nError: {ve}")
-
-    # Handle general exceptions
-    except Exception as e:
-        print("\nAn unexpected error occurred:", e)
+if __name__ == "__main__":
+    start()
